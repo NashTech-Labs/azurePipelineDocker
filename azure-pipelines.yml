@@ -49,12 +49,26 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       try {
-      $registry = "${{ parameters.ACRname}}.azurecr.io" #create registry url
-      Write-Host "##vso[task.setvariable variable=registry]$registry" #make the registry accessible for other tasks
+        $registry = "${{ parameters.ACRname}}.azurecr.io" #create registry url
+        Write-Host "##vso[task.setvariable variable=registry]$registry" #make the registry accessible for other tasks
 
-      docker build -f ${{ parameters.DockerfilePath}} -t buildimage ${{ parameters.buildArgs}} ${{ parameters.buildContext}} #buildimage name is taken to refer when passing tags
+        docker build -f ${{ parameters.DockerfilePath}} -t buildimage ${{ parameters.buildArgs}} ${{ parameters.buildContext}} #buildimage name is taken to refer when passing tags
 
-      if($)
+        if(!$?){
+          throw "docker build failed" #cross check for build failure
+        }
+
+        $tags = ${{ parameters.imageTags}} -split "[\n,]+" #consider multiple tags separated by ','
+        Foreach($tag in tags){
+          $imagetag = "$registry/${{ parameters.imageRepository }}:$tag"
+          docker image tag buildimage $imagetag 
+        }
+
+        docker image ls
+
+        catch {
+          throw $_ 
+        }
       }
 
 - task: AzureCLI@2
@@ -66,5 +80,4 @@ steps:
     scriptLocation: 'inlineScript'
     inlineScript: |
       az acr login ${{ parameters.ACRname }}
-
 
