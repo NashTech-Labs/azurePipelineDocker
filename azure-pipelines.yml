@@ -23,16 +23,48 @@ parameters:
   displayName: "arguements to be passed while docker build"
   type: string
 
+- name: buildContext
+  displayName: "Context to be used by Docker Build"
+  type: string
+
 
 steps:
 
 - task: AzureCLI@2
-  name: AzureLoginBuild
-  displayName: 'Azure Login and Build'
+  name: ACRlogin
+  displayName: 'Azure Container Registry Login'
   inputs:
     azureSubscription: '${{ parameters.ServiceConnection}}'
     scriptType: 'pscore'
     scriptLocation: 'inlineScript'
     inlineScript: |
       az acr login ${{ parameters.ACRname }}
+
+- task: AzureCLI@2
+  name: DockerBuild
+  displayName: 'Docker Build'
+  inputs:
+    azureSubscription: '${{ parameters.ServiceConnection}}'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      try {
+      $registry = "${{ parameters.ACRname}}.azurecr.io" #create registry url
+      Write-Host "##vso[task.setvariable variable=registry]$registry" #make the registry accessible for other tasks
+
+      docker build -f ${{ parameters.DockerfilePath}} -t buildimage ${{ parameters.buildArgs}} ${{ parameters.buildContext}} #buildimage name is taken to refer when passing tags
+
+      if($)
+      }
+
+- task: AzureCLI@2
+  name: DockerPush
+  displayName: 'Docker Push'
+  inputs:
+    azureSubscription: '${{ parameters.ServiceConnection}}'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az acr login ${{ parameters.ACRname }}
+
 
