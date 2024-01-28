@@ -50,7 +50,6 @@ steps:
     inlineScript: |
       try {
         $registry = "${{ parameters.ACRname}}.azurecr.io" #create registry url
-        Write-Host "##vso[task.setvariable variable=registry]$registry" #make the registry accessible for other tasks
 
         docker build -f ${{ parameters.DockerfilePath}} -t buildimage ${{ parameters.buildArgs}} ${{ parameters.buildContext}} #buildimage name is taken to refer when passing tags
 
@@ -60,8 +59,8 @@ steps:
 
         $tags = ${{ parameters.imageTags}} -split "[\n,]+" #consider multiple tags separated by ','
         Foreach($tag in tags){
-          $imagetag = "$registry/${{ parameters.imageRepository }}:$tag"
-          docker image tag buildimage $imagetag 
+          $taggedimage = "$registry/${{ parameters.ACRrepo }}:$tag"
+          docker image tag buildimage $taggedimage 
         }
 
         docker image ls
@@ -79,5 +78,19 @@ steps:
     scriptType: 'pscore'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      az acr login ${{ parameters.ACRname }}
+      try {
+        $registry = "${{ parameters.ACRname}}.azurecr.io" #create registry url
+
+        docker image ls
+        
+        docker image push --all-tags $registry/${{ parameters.ACRrepo }}
+
+        if(!$?){
+          throw "docker push failed for $registry/${{ parameters.ACRrepo }}:${{parameters.imageTags}}" #cross check for push failure
+        }
+
+        catch {
+          throw $_ 
+        }
+      }
 
