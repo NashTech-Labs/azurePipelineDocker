@@ -1,0 +1,38 @@
+parameters:
+- name: ServiceConnection
+  displayName: "Name of ARM based Service Connection"
+  type: string
+
+- name: ACRname
+  displayName: "Name of Azure Container Registry"
+  type: string
+
+- name: ACRrepo
+  displayName: "Name of ACR repository where to push image"
+  type: string
+
+- name: DockerfilePath
+  displayName: "Location of Dockerfile to build image"
+  type: string
+
+- name: imageTags
+  displayName: "tags to be used in image"
+  type: string
+
+- name: buildArgs
+  displayName: "arguements to be passed while docker build"
+  type: string
+
+
+steps:
+
+- task: AzureCLI@2
+  name: AzureLoginBuild
+  displayName: 'Azure Login and Build'
+  inputs:
+    azureSubscription: '${{ parameters.ServiceConnection}}'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az acr login ${{ parameters.ACRname }}
+
