@@ -9,16 +9,16 @@ The template pipeline requires the following parameters to be defined:
 ### Parameters:
 
 
-    | Name  | Displayname | Comments |
-    | ------------- | ------------- | ------------- |
-    | ServiceConnection | Azure Service Connection forazure resource manager in your Azure pipeline |This helps the module to authenticate with azure cli |
-    | ACRname | Azure Container Registry Name |  |
-    | ACRrepo | acr docker repostiroy | docker registry imagename to be created |
-    | DockerfilePath  | location of Dockerfile | Required when buid step |
-    | imageTags | Version or tag for image | when multiple tags pass in following way: **"1.2.3,latest"** |
-    | buildContext  | the path to constitute everything for Docker Image | Optionally used with build step |
-    | buildArgs | arguments for build step | string | | | Optional |--build-arg var.value=1 |
-    -----------------------------------------------------------------------------------------------------------------------
+| Name  | Displayname | Comments |
+| ------------- | ------------- | ------------- |
+| ServiceConnection | Azure Service Connection forazure resource manager in your Azure pipeline |This helps the module to authenticate with azure cli |
+| ACRname | Azure Container Registry Name |  |
+| ACRrepo | acr docker repostiroy | docker registry imagename to be created |
+| DockerfilePath  | location of Dockerfile | Required when buid step |
+| imageTags | Version or tag for image | when multiple tags pass in following way: **"1.2.3,latest"** |
+| buildContext  | the path to constitute everything for Docker Image | Optionally used with build step |
+| buildArgs | arguments for build step | string | | | Optional |--build-arg var.value=1 |
+-----------------------------------------------------------------------------------------------------------------------
  
 ### How to Use:
 
